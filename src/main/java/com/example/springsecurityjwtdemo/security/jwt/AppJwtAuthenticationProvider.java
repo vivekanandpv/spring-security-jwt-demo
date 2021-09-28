@@ -1,6 +1,7 @@
 package com.example.springsecurityjwtdemo.security.jwt;
 
 import com.example.springsecurityjwtdemo.services.AppUserDetailsService;
+import com.example.springsecurityjwtdemo.services.IAppUserDetailsService;
 import com.example.springsecurityjwtdemo.utils.AppJwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -15,10 +16,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AppJwtAuthenticationProvider implements AuthenticationProvider {
-    private final AppUserDetailsService userDetailsService;
+    private final IAppUserDetailsService userDetailsService;
     private final AppJwtUtils jwtUtils;
 
-    public AppJwtAuthenticationProvider(AppUserDetailsService userDetailsService, AppJwtUtils jwtUtils) {
+    public AppJwtAuthenticationProvider(IAppUserDetailsService userDetailsService, AppJwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
         this.jwtUtils = jwtUtils;
     }

@@ -37,6 +37,7 @@ public class AuthService implements IAuthService {
                 .orElseThrow(LoginFailedException::new);
 
         if (!passwordEncoder.matches(viewModel.getPassword(), user.getPassword())) {
+            userDetailsService.logFailedLogin(viewModel.getUsername());
             throw new LoginFailedException();
         }
 

@@ -25,7 +25,7 @@ public class AuthController {
 
 
     @PostMapping(value = "/register")
-    @PreAuthorize("hasAuthority('admin')")
+//    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<GeneralServerResponse> register(@RequestBody UserRegisterViewModel viewModel) {
         return ResponseEntity.ok(authService.register(viewModel));
     }

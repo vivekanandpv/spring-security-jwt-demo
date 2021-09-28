@@ -34,4 +34,6 @@ public interface IAppUserDetailsService extends UserDetailsService {
     Set<Role> getRolesByUsername(String username);
 
     List<User> getAllUsers();
+
+    void logFailedLogin(String username);
 }

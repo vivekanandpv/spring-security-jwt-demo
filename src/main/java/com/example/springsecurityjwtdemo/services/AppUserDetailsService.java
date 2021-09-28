@@ -223,7 +223,7 @@ public class AppUserDetailsService implements IAppUserDetailsService {
         this.userRepository.saveAndFlush(user);
     }
 
-    private void logFailedLogin(String username) {
+    public void logFailedLogin(String username) {
         User user = this.findUser(username)
                 .orElseThrow(RecordNotFoundException::new);
 
