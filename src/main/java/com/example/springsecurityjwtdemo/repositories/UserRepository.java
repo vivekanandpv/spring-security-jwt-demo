@@ -9,10 +9,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findUserByEmail(String email);
+    Optional<User> findUserByUsername(String username);
 
-    boolean existsById(int id);
+    boolean existsByUsername(String username);
 
-    @Query("SELECT user.roles FROM User user WHERE user.id = ?1")
-    Set<Role> findRolesByUsername(int id);
+    @Query("SELECT user.roles FROM User user WHERE user.username = ?1")
+    Set<Role> findRolesByUsername(String username);
 }

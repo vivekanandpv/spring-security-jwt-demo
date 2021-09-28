@@ -1,21 +1,11 @@
-package com.example.springsecurityjwtdemo.models;
+package com.example.springsecurityjwtdemo.viewmodels;
 
-import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-@Entity
-//  user is a keyword in SQL, hence renaming the table
-@Table(name = "app_users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserListViewModel {
     private int id;
-
-    @Column(unique = true)
     private String username;
-
     private String firstName;
     private String lastName;
     private String employeeId;
@@ -23,6 +13,7 @@ public class User {
     private String department;
     private String email;
     private String phoneNumber;
+    private String resetKey;
     private ZonedDateTime registeredOn;
     private ZonedDateTime lastLogin;
     private boolean isAdminBlock;
@@ -30,20 +21,9 @@ public class User {
     private ZonedDateTime passwordResetOn;
     private ZonedDateTime loginBlockOn;
     private ZonedDateTime adminBlockOn;
-
+    private String role;
     private String remarks;
-    private String password;
-
-    private String resetKey;
-    private int failedAttempts;
-    private ZonedDateTime lastFailedLogin;
-    private ZonedDateTime passwordChangedOn;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "app_user_roles",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "role_id") })
-    private Set<Role> roles = new HashSet<>();
+    private List<String> roles;
 
     public int getId() {
         return id;
@@ -117,6 +97,14 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getResetKey() {
+        return resetKey;
+    }
+
+    public void setResetKey(String resetKey) {
+        this.resetKey = resetKey;
+    }
+
     public ZonedDateTime getRegisteredOn() {
         return registeredOn;
     }
@@ -173,6 +161,14 @@ public class User {
         this.adminBlockOn = adminBlockOn;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getRemarks() {
         return remarks;
     }
@@ -181,51 +177,11 @@ public class User {
         this.remarks = remarks;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getResetKey() {
-        return resetKey;
-    }
-
-    public void setResetKey(String resetKey) {
-        this.resetKey = resetKey;
-    }
-
-    public int getFailedAttempts() {
-        return failedAttempts;
-    }
-
-    public void setFailedAttempts(int failedAttempts) {
-        this.failedAttempts = failedAttempts;
-    }
-
-    public ZonedDateTime getLastFailedLogin() {
-        return lastFailedLogin;
-    }
-
-    public void setLastFailedLogin(ZonedDateTime lastFailedLogin) {
-        this.lastFailedLogin = lastFailedLogin;
-    }
-
-    public ZonedDateTime getPasswordChangedOn() {
-        return passwordChangedOn;
-    }
-
-    public void setPasswordChangedOn(ZonedDateTime passwordChangedOn) {
-        this.passwordChangedOn = passwordChangedOn;
-    }
-
-    public Set<Role> getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 }
