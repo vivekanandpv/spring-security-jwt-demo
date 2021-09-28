@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ import java.util.function.Function;
 
 @Component
 public class AppJwtUtils {
-    @Value("${APP_SECRET}")
+    @Value("${APP_SECRET}") //  SpEL (from environment variable)
     private String SERVER_SECRET;
 
     public byte[] getSigningKey() {

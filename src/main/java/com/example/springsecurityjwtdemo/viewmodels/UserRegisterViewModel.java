@@ -1,6 +1,5 @@
 package com.example.springsecurityjwtdemo.viewmodels;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserRegisterViewModel {

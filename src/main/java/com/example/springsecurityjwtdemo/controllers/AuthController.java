@@ -18,9 +18,9 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping(value = "/login")
-    public ResponseEntity<TokenResponse> login(@RequestHeader("X-App-Username") String username) {
-        return ResponseEntity.ok(authService.getToken(username));
+    @PostMapping(value = "/login")
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginViewModel viewModel) {
+        return ResponseEntity.ok(authService.getToken(viewModel));
     }
 
 

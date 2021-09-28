@@ -1,11 +1,14 @@
 package com.example.springsecurityjwtdemo.services;
 
 import com.example.springsecurityjwtdemo.exceptions.GeneralAuthenticationException;
+import com.example.springsecurityjwtdemo.exceptions.LoginFailedException;
 import com.example.springsecurityjwtdemo.exceptions.RecordNotFoundException;
 import com.example.springsecurityjwtdemo.models.User;
+import com.example.springsecurityjwtdemo.repositories.UserRepository;
 import com.example.springsecurityjwtdemo.utils.AppJwtUtils;
 import com.example.springsecurityjwtdemo.viewmodels.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,19 +18,30 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthService implements IAuthService {
-    private final AppUserDetailsService userDetailsService;
+    private final IAppUserDetailsService userDetailsService;
     private final AppJwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    public AuthService(AppUserDetailsService userDetailsService, AppJwtUtils jwtUtils) {
+    public AuthService(IAppUserDetailsService userDetailsService, AppJwtUtils jwtUtils, PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
         this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
 
     @Override
-    public TokenResponse getToken(String username) {
+    public TokenResponse getToken(LoginViewModel viewModel) {
+        User user = userRepository.findUserByUsername(viewModel.getUsername())
+                .orElseThrow(LoginFailedException::new);
+
+        if (!passwordEncoder.matches(viewModel.getPassword(), user.getPassword())) {
+            throw new LoginFailedException();
+        }
+
         String token = jwtUtils.generateToken(userDetailsService
-                .loadUserByUsername(username));
+                .loadUserByUsername(viewModel.getUsername()));
 
         return new TokenResponse(token);
     }

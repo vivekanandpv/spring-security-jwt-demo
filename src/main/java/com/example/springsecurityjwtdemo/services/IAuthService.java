@@ -5,7 +5,7 @@ import com.example.springsecurityjwtdemo.viewmodels.*;
 import java.util.List;
 
 public interface IAuthService {
-    TokenResponse getToken(String username);
+    TokenResponse getToken(LoginViewModel viewModel);
     GeneralServerResponse register(UserRegisterViewModel viewModel);
     List<UserListViewModel> getAllUsers();
     UserListViewModel getUserById(int id);

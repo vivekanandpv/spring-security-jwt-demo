@@ -1,5 +1,6 @@
 package com.example.springsecurityjwtdemo.services;
 
+import com.example.springsecurityjwtdemo.exceptions.RecordNotFoundException;
 import com.example.springsecurityjwtdemo.models.Role;
 import com.example.springsecurityjwtdemo.models.User;
 import com.example.springsecurityjwtdemo.repositories.RoleRepository;
@@ -11,7 +12,6 @@ import com.example.springsecurityjwtdemo.viewmodels.PasswordResetViewModel;
 import com.example.springsecurityjwtdemo.viewmodels.ProcessCompletionViewModel;
 import com.example.springsecurityjwtdemo.viewmodels.UserRegisterViewModel;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class AppUserDetailsService implements UserDetailsService {
+public class AppUserDetailsService implements IAppUserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,17 +37,18 @@ public class AppUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> optionalUser = this.userRepository.findUserByUsername(username);
-
-        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        User user = this.userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new RecordNotFoundException());
 
         return new AppUserDetails(user);
     }
 
+    @Override
     public boolean usernameExists(String username) {
         return this.userRepository.existsByUsername(username);
     }
 
+    @Override
     public User createUser(UserRegisterViewModel viewModel) {
         User user = new User();
         user.setUsername(viewModel.getUsername());
@@ -85,14 +86,10 @@ public class AppUserDetailsService implements UserDetailsService {
         return userRepository.saveAndFlush(user);
     }
 
+    @Override
     public ProcessCompletionViewModel adminBlockUser(String username) {
-        Optional<User> optionalUser = this.findUser(username);
-
-        if (optionalUser.isEmpty()) {
-            return new ProcessCompletionViewModel(false, List.of("Username doesn't exist"), null);
-        }
-
-        User user = optionalUser.get();
+        User user = this.findUser(username)
+                .orElseThrow(RecordNotFoundException::new);
 
         user.setAdminBlock(true);
         user.setLoginBlock(true);
@@ -104,14 +101,10 @@ public class AppUserDetailsService implements UserDetailsService {
         return new ProcessCompletionViewModel(true);
     }
 
+    @Override
     public ProcessCompletionViewModel loginUnblockUser(String username) {
-        Optional<User> optionalUser = this.findUser(username);
-
-        if (optionalUser.isEmpty()) {
-            return new ProcessCompletionViewModel(false, List.of("Username doesn't exist"), null);
-        }
-
-        User user = optionalUser.get();
+        User user = this.findUser(username)
+                .orElseThrow(RecordNotFoundException::new);
 
         if (user.isAdminBlock()) {
             return new ProcessCompletionViewModel(false, List.of("User has admin block"), null);
@@ -135,14 +128,10 @@ public class AppUserDetailsService implements UserDetailsService {
         return new ProcessCompletionViewModel(true, null, resetKey);
     }
 
+    @Override
     public ProcessCompletionViewModel adminUnblockUser(String username) {
-        Optional<User> optionalUser = this.findUser(username);
-
-        if (optionalUser.isEmpty()) {
-            return new ProcessCompletionViewModel(false, List.of("Username doesn't exist"), null);
-        }
-
-        User user = optionalUser.get();
+        User user = this.findUser(username)
+                .orElseThrow(RecordNotFoundException::new);
 
         if (!user.isAdminBlock()) {
             return new ProcessCompletionViewModel(false, List.of("User doesn't have admin block"), null);
@@ -162,14 +151,10 @@ public class AppUserDetailsService implements UserDetailsService {
         return new ProcessCompletionViewModel(true);
     }
 
+    @Override
     public ProcessCompletionViewModel changePassword(PasswordChangeViewModel viewModel) {
-        Optional<User> optionalUser = this.findUser(viewModel.getUsername());
-
-        if (optionalUser.isEmpty()) {
-            return new ProcessCompletionViewModel(false, List.of("Username doesn't exist"), null);
-        }
-
-        User user = optionalUser.get();
+        User user = this.findUser(viewModel.getUsername())
+                .orElseThrow(RecordNotFoundException::new);
 
         if (this.passwordEncoder.matches(viewModel.getCurrentPassword(), user.getPassword())) {
             user.setPassword(this.passwordEncoder.encode(viewModel.getNewPassword()));
@@ -183,18 +168,14 @@ public class AppUserDetailsService implements UserDetailsService {
         }
     }
 
+    @Override
     public ProcessCompletionViewModel resetPassword(PasswordResetViewModel viewModel) {
-        Optional<User> optionalUser = this.findUser(viewModel.getUsername());
-
-        if (optionalUser.isEmpty()) {
-            return new ProcessCompletionViewModel(false, List.of("Username doesn't exist"), null);
-        }
-
         if (!viewModel.getNewPassword().equals(viewModel.getConfirmNewPassword())) {
             return new ProcessCompletionViewModel(false, List.of("New passwords do not match"), null);
         }
 
-        User user = optionalUser.get();
+        User user = this.findUser(viewModel.getUsername())
+                .orElseThrow(RecordNotFoundException::new);
 
         if (viewModel.getResetKey().equals(user.getResetKey())) {
             user.setPassword(this.passwordEncoder.encode(viewModel.getNewPassword()));
@@ -212,14 +193,29 @@ public class AppUserDetailsService implements UserDetailsService {
         }
     }
 
-    public void logSuccessfulLogin(String username) {
-        Optional<User> optionalUser = this.findUser(username);
+    @Override
+    public Optional<User> findUser(String username) {
+        return this.userRepository.findUserByUsername(username);
+    }
 
-        if (optionalUser.isEmpty()) {
-            return;
-        }
+    @Override
+    public Optional<User> findUserById(int id) {
+        return this.userRepository.findById(id);
+    }
 
-        User user = optionalUser.get();
+    @Override
+    public Set<Role> getRolesByUsername(String username) {
+        return this.userRepository.findRolesByUsername(username);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return this.userRepository.findAll();
+    }
+
+    private void logSuccessfulLogin(String username) {
+        User user = this.findUser(username)
+                .orElseThrow(RecordNotFoundException::new);
 
         user.setLastLogin(ZonedDateTime.now(ZoneId.of("UTC")));
         user.setFailedAttempts(0);
@@ -227,14 +223,9 @@ public class AppUserDetailsService implements UserDetailsService {
         this.userRepository.saveAndFlush(user);
     }
 
-    public void logFailedLogin(String username) {
-        Optional<User> optionalUser = this.findUser(username);
-
-        if (optionalUser.isEmpty()) {
-            return;
-        }
-
-        User user = optionalUser.get();
+    private void logFailedLogin(String username) {
+        User user = this.findUser(username)
+                .orElseThrow(RecordNotFoundException::new);
 
         user.setLastFailedLogin(ZonedDateTime.now(ZoneId.of("UTC")));
 
@@ -250,28 +241,19 @@ public class AppUserDetailsService implements UserDetailsService {
         this.userRepository.saveAndFlush(user);
     }
 
-    public boolean isLoginAllowed(String username) {
-        Optional<User> optionalUser = this.findUser(username);
-
-        if (optionalUser.isEmpty()) {
-            return false;
-        }
-
-        User user = optionalUser.get();
+    private boolean isLoginAllowed(String username) {
+        User user = this.findUser(username)
+                .orElseThrow(RecordNotFoundException::new);
 
         return !(user.isLoginBlock() || user.isAdminBlock());
     }
 
-    public boolean processLogin(String username, String rawPassword) {
+    private boolean processLogin(String username, String rawPassword) {
         if (this.isLoginAllowed(username)) {
-            Optional<User> optionalUser = this.findUser(username);
+            User user = this.findUser(username)
+                    .orElseThrow(RecordNotFoundException::new);
 
-            if (optionalUser.isEmpty()) {
-                return false;
-            }
-
-            User user = optionalUser.get();
-            if(this.passwordEncoder.matches(rawPassword, user.getPassword())) {
+            if (this.passwordEncoder.matches(rawPassword, user.getPassword())) {
                 this.logSuccessfulLogin(username);
                 return true;
             } else {
@@ -281,21 +263,5 @@ public class AppUserDetailsService implements UserDetailsService {
         } else {
             return false;
         }
-    }
-
-    public Optional<User> findUser(String username) {
-        return this.userRepository.findUserByUsername(username);
-    }
-
-    public Optional<User> findUserById(int id) {
-        return this.userRepository.findById(id);
-    }
-
-    public Set<Role> getRolesByUsername(String username) {
-        return this.userRepository.findRolesByUsername(username);
-    }
-
-    public List<User> getAllUsers() {
-        return this.userRepository.findAll();
     }
 }
