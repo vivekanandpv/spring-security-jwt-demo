@@ -44,6 +44,8 @@ public class AppJwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return request.getServletPath().equals("/api/v1/auth/login")
                 || request.getServletPath().equals("/api/v1/auth/reset-password")
-                || request.getServletPath().equals("/api/v1/auth/register");
+                || request.getServletPath().equals("/api/v1/auth/register")     //  comment it after initial user registration
+                || request.getServletPath().startsWith("/swagger")              //  for keeping swagger away from spring security
+                || request.getServletPath().startsWith("/v2");                  //  also used by swagger
     }
 }
