@@ -35,9 +35,9 @@ public class AppJwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (AuthenticationException ae) {
                 httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
+        } else {
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
-
-        httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Override
