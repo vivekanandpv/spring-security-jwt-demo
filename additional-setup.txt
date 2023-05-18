@@ -1,0 +1,25 @@
+APP_SECRET environment variable:
+20a8d1b0-d9fe-45de-bbef-a30bdf2c0318-d2733eca-17ae-40e6-bacd-f1f498878d91-f570063d-daf6-40cb-8bab-9037fb3a8755
+
+Registration JSON
+
+{
+  "username": "vivekanand",
+  "firstName": "Vivekanand",
+  "lastName": "P V",
+  "employeeId": "ABCD1234",
+  "designation": "Developer",
+  "department": "Software Development",
+  "email": "vivek@gmail.com",
+  "phoneNumber": "8899774455",
+  "password": "Password123@",
+  "roles": ["admin", "user"]
+}
+
+Password Reset JSON
+{
+  "username": "vivekanand",
+  "resetKey": "QC2XXKRL",
+  "newPassword": "Year@2023",
+  "confirmNewPassword": "Year@2023"
+}
