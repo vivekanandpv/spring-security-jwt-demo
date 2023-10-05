@@ -1,0 +1,34 @@
+Step 1. Create auth_demo database
+Step 2. Run the application, which creates the tables
+Step 3. In app_roles table, insert admin and user roles
+Step 4. To register
+
+POST http://localhost:8080/api/v1/auth/register
+{
+    "username": "vivekpv",
+    "firstName": "Vivekanand",
+    "lastName": "P V",
+    "employeeId": "V12345",
+    "designation": "developer",
+    "department": "IT",
+    "phoneNumber": "9988776655",
+    "remarks": "Hello, world!",
+    "password": "password",
+    "roles": ["admin", "user"]
+}
+
+Step 5. Use the reset key in reset password
+POST http://localhost:8080/api/v1/auth/reset-password
+{
+    "username": "vivekpv",
+    "resetKey": "<YOUR RESET KEY>",
+    "newPassword": "password",
+    "confirmNewPassword": "password"
+}
+
+Step 6. You can now login
+POST http://localhost:8080/api/v1/auth/login
+{
+    "username": "vivekpv",
+    "password": "password"
+}
