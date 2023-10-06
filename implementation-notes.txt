@@ -1,0 +1,21 @@
+1. in pom.xml, define the dependencies: jpa, security, jwt related, postgresql
+
+2. define the user and role entities and repositories
+
+2a. define GeneralAuthenticationException and LoginFailedException in exceptions package
+
+3. create the viewmodels: login, token, user register, password reset, password change
+
+4. Create AppJwtUtils
+
+5. in application.properties, define: APP_SECRET=<long guid>
+
+6. in config package: AuthSecurityConfiguration and GeneralBeanConfiguration
+
+7. define all the classes in security package
+
+8. in services define: AppUserDetailsService and AuthService along with their interfaces
+
+9. implement the auth controller
+
+10. in the exception handler advice, handle the login exception
